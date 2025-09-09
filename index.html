@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRUST BD TikTok Downloader</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #ff7eb9, #ff65a3, #a18cd1, #fbc2eb);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+}
+@keyframes gradientBG {0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+
+.header {
+  text-align: center;
+  padding: 20px 16px 10px 16px;
+}
+.header img {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+.header h1 {
+  font-size: 26px;
+  color: #fff;
+  margin-top: 12px;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  padding: 24px;
+  max-width: 500px;
+  margin: 20px auto;
+  backdrop-filter: blur(8px);
+}
+
+input[type="text"] {
+  width: 90%;
+  padding: 14px 16px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  margin-bottom: 16px;
+  outline: none;
+  transition: 0.3s;
+}
+input[type="text"]:focus {
+  border-color: #ff65a3;
+  box-shadow: 0 0 10px rgba(255,101,163,0.3);
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(90deg, #ff7eb9, #a18cd1);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+#result {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 15px;
+  color: #333;
+}
+
+.download-options {
+  margin-top: 20px;
+}
+
+.download-link {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  margin: 10px 0;
+  transition: 0.3s;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+.download-link img {
+  width: 26px;
+  height: 26px;
+  margin-right: 12px;
+}
+.download-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+
+.no-watermark { background: #111; }
+.mp3 { background: #ff5722; }
+.hd { background: #2196f3; }
+
+@media(max-width: 600px) {
+  .header h1 { font-size: 22px; }
+  .download-link img { width: 22px; height: 22px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="banner.jpg" alt="Banner Image">
+  <h1>Swygen TikTok Downloader</h1>
+</div>
+
+<div class="card">
+  <input type="text" id="videoUrl" placeholder="TikTok ভিডিও লিংক দিন..." />
+  <button onclick="getDownloadLinks()">Get Download Options</button>
+  <div id="result"></div>
+  <div class="download-options" id="downloadOptions"></div>
+</div>
+
+<script>
+async function getDownloadLinks() {
+  const url = document.getElementById('videoUrl').value.trim();
+  const result = document.getElementById('result');
+  const downloadOptions = document.getElementById('downloadOptions');
+  downloadOptions.innerHTML = '';
+  result.innerHTML = '';
+
+  if (!url) {
+    result.innerHTML = "ভিডিও লিংক দিন।";
+    return;
+  }
+
+  result.innerHTML = "Processing...";
+
+  try {
+    const res = await fetch(`/.netlify/functions/getVideo?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+
+    if (!data?.data) {
+      result.innerHTML = "ভিডিও URL পাওয়া যায়নি বা API কাজ করছে না।";
+      return;
+    }
+
+    result.innerHTML = "ডাউনলোড অপশন নিচে দেওয়া হলো:";
+
+    const optionsHTML = `
+      <a href="${data.data.no_watermark}" target="_blank" class="download-link no-watermark">
+        <img src="watermark-icon.png" alt="No Watermark"> Without Watermark
+      </a>
+      <a href="${data.data.audio}" target="_blank" class="download-link mp3">
+        <img src="mp3-icon.png" alt="MP3"> MP3 Download
+      </a>
+      <a href="${data.data.hd}" target="_blank" class="download-link hd">
+        <img src="hd-icon.png" alt="HD"> HD Video Download
+      </a>
+    `;
+    downloadOptions.innerHTML = optionsHTML;
+
+  } catch (err) {
+    console.error(err);
+    result.innerHTML = "কোথাও ত্রুটি ঘটেছে। আবার চেষ্টা করুন।";
+  }
+}
+</script>
+
+</body>
+</html>
